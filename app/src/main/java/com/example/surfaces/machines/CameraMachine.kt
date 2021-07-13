@@ -7,6 +7,7 @@ import android.hardware.camera2.CameraMetadata.LENS_FACING_BACK
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
+import android.util.Log
 import android.util.Size
 import android.view.Surface
 import android.widget.Toast
@@ -162,6 +163,7 @@ class CameraMachine() : StateMachine<CameraState, CameraAction> {
         val cameraDevice = state.cameraHolder.cameraDevice ?: return null
         val texture = action.texture
         val size = state.cameraHolder.size
+        Log.e("TEST!", "size $size")
         if (size != null) {
             texture.rotate =
                 if (size.width > size.height) Surface.ROTATION_90

@@ -2,6 +2,7 @@ package com.example.surfaces.machines
 
 import android.graphics.drawable.Drawable
 import android.opengl.GLSurfaceView
+import com.example.surfaces.Surfaces
 import com.example.surfaces.helpers.OpenGLScene
 import com.example.surfaces.machines.GLSurfaceAction.*
 import com.example.surfaces.machines.GLSurfaceState.*
@@ -23,7 +24,6 @@ class GLSurfaceMachine: StateMachine<GLSurfaceState, GLSurfaceAction> {
         mh.openGLScene?.let {
             EncoderSurfaceParams(
                 it.openglContext,
-                it.smallTexture.textureId,
                 it.fullscreenTexture.textureId
             )
         }
@@ -82,6 +82,10 @@ class GLSurfaceMachine: StateMachine<GLSurfaceState, GLSurfaceAction> {
         action: Create
     ): UIHolder {
         action.glSurfaceView.setEGLContextClientVersion(2)
+        action.glSurfaceView.postDelayed(Runnable{
+            Surfaces.patch(action.glSurfaceView.holder.surface)
+        }, 200)
+
 
         return state.uiHolder.copy(
             glSurfaceView = action.glSurfaceView,
@@ -111,22 +115,13 @@ class GLSurfaceMachine: StateMachine<GLSurfaceState, GLSurfaceAction> {
     ): UIHolder? {
         val width = action.surfaceWidth
         val height = action.surfaceHeight
-        val drawable = state.uiHolder.drawable
 
         val openGLScene = OpenGLScene(width, height)
-
-        drawable?.setBounds(
-            0,
-            0,
-            openGLScene.smallTexture.textureWidth,
-            openGLScene.smallTexture.textureHeight
-        )
 
         fullscreenProducer.putResult(openGLScene.fullscreenTexture)
         encoderProducer.putResult(
             EncoderSurfaceParams(
                 openGLScene.openglContext,
-                openGLScene.smallTexture.textureId,
                 openGLScene.fullscreenTexture.textureId
             )
         )
@@ -140,22 +135,8 @@ class GLSurfaceMachine: StateMachine<GLSurfaceState, GLSurfaceAction> {
     }
 
     private fun drawFrame(state: DrawingAvailable) {
-        drawDrawable(state)
-
         state.uiHolder.openGLScene?.updateFrame()
         state.uiHolder.encoderDrawingCaller?.invoke()
-    }
-
-    private fun drawDrawable(state: DrawingAvailable) {
-        val smallSurface = state.uiHolder.openGLScene?.smallTexture?.surface
-        val drawable = state.uiHolder.drawable
-
-        if (smallSurface != null && drawable != null) {
-            val bounds = drawable.bounds
-            val canvas = smallSurface.lockCanvas(bounds)
-            drawable.draw(canvas)
-            smallSurface.unlockCanvasAndPost(canvas)
-        }
     }
 
 }

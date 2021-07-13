@@ -6,6 +6,7 @@ import android.content.Context
 import android.hardware.camera2.CameraManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.surfaces.helpers.ContextHelper
@@ -31,9 +32,7 @@ class MainActivity : AppCompatActivity() {
         recordBtn = findViewById(R.id.record_btn)
         glSurfaceView = findViewById(R.id.gl_view)
 
-        val width = ContextHelper.getDisplayWidth()
-        glSurfaceView.layoutParams.width = width
-        glSurfaceView.layoutParams.height = (OpenGLScene.ASPECT_RATIO * width).toInt()
+        glSurfaceView.holder.setFixedSize(1080, 1920)
 
         glSurfaceMachine.send(
             GLSurfaceAction.Create(
@@ -51,18 +50,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         recordBtn.setOnClickListener {
-            if (encoderMachine.isActive()) {
-                encoderMachine.send(EncoderAction.Stop)
-            } else {
-                permission.checkOrAsk(WRITE_EXTERNAL_STORAGE) {
-                    encoderMachine.send(
-                        EncoderAction.Start(
-                            glSurfaceMachine.encoderProducer
-                        )
-                    )
-                }
-            }
+            glSurfaceMachine.send(GLSurfaceAction.Stop)
+            encoderMachine.send(EncoderAction.Stop)
+            cameraMachine.send(CameraAction.Stop)
+//            if (encoderMachine.isActive()) {
+//                encoderMachine.send(EncoderAction.Stop)
+//            } else {
+//                permission.checkOrAsk(WRITE_EXTERNAL_STORAGE) {
+//                    encoderMachine.send(
+//                        EncoderAction.Start(
+//                            glSurfaceMachine.encoderProducer
+//                        )
+//                    )
+//                }
+//            }
         }
+
+        val params = window.attributes
+        params.rotationAnimation = WindowManager.LayoutParams.ROTATION_ANIMATION_SEAMLESS
+        window.attributes = params
     }
 
     override fun onResume() {

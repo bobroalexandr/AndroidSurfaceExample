@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
+import android.util.Log
 import android.view.Surface
 import com.example.surfaces.utils.ErrorUtils
 import java.nio.ByteBuffer
@@ -59,6 +60,7 @@ class OpenGLExternalTexture(
             GLES20.GL_LINEAR.toFloat()
         )
 
+        Log.e("TEST!", "texture $textureWidth x $textureHeight $rotate")
         surfaceTexture = SurfaceTexture(textureId)
         surfaceTexture.setDefaultBufferSize(textureWidth, textureHeight)
 
@@ -112,22 +114,22 @@ class OpenGLExternalTexture(
         Matrix.setIdentityM(mMVPMatrix, 0)
         Matrix.setIdentityM(mTexMatrix, 0)
 
-        when (rotate) {
-            Surface.ROTATION_90-> {
-                Matrix.rotateM(mTexMatrix, 0, 90f, 0f, 0f, 1f)
-                Matrix.translateM(mTexMatrix, 0, 0f, -1f, 0f)
-            }
-            Surface.ROTATION_180 -> {
-                Matrix.rotateM(mTexMatrix, 0, 180f, 0f, 0f, 1f)
-                Matrix.translateM(mTexMatrix, 0, -1f, -1f, 0f)
-            }
-            Surface.ROTATION_270 -> {
-                Matrix.rotateM(mTexMatrix, 0, 270f, 0f, 0f, 1f)
-                Matrix.translateM(mTexMatrix, 0, -1f, 0f, 0f)
-            }
-
-            else -> {}
-        }
+//        when (rotate) {
+//            Surface.ROTATION_90-> {
+//                Matrix.rotateM(mTexMatrix, 0, 90f, 0f, 0f, 1f)
+//                Matrix.translateM(mTexMatrix, 0, 0f, -1f, 0f)
+//            }
+//            Surface.ROTATION_180 -> {
+//                Matrix.rotateM(mTexMatrix, 0, 180f, 0f, 0f, 1f)
+//                Matrix.translateM(mTexMatrix, 0, -1f, -1f, 0f)
+//            }
+//            Surface.ROTATION_270 -> {
+//                Matrix.rotateM(mTexMatrix, 0, 270f, 0f, 0f, 1f)
+//                Matrix.translateM(mTexMatrix, 0, -1f, 0f, 0f)
+//            }
+//
+//            else -> {}
+//        }
 
         GLES20.glUniformMatrix4fv(uMvpHandler, 1, false, mMVPMatrix, 0)
         GLES20.glUniformMatrix4fv(uTexHandler, 1, false, mTexMatrix, 0)

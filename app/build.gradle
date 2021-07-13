@@ -5,13 +5,21 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.example.surfacemeetup"
-        minSdkVersion 22
-        targetSdkVersion 26
+        minSdkVersion 30
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
     }
 }
 

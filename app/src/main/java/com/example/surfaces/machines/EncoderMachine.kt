@@ -76,11 +76,10 @@ class EncoderMachine : StateMachine<EncoderState, EncoderAction> {
 
     private fun fetchContext(action: Start) {
         action.surfaceProducer.consume { triplet ->
-            val (context, smallTextureId, fullscreenTextureId) = triplet
+            val (context, fullscreenTextureId) = triplet
             send(
                 GLContextReady(
                     context,
-                    smallTextureId,
                     fullscreenTextureId
                 )
             )
@@ -92,7 +91,6 @@ class EncoderMachine : StateMachine<EncoderState, EncoderAction> {
         action: GLContextReady
     ): EncoderHolder {
         val sharedContext = action.sharedEglContext
-        val drawableTextureId = action.drawableTextureId
         val cameraTextureId = action.cameraTextureId
 
         val outputFile = File(filePath)
@@ -114,8 +112,7 @@ class EncoderMachine : StateMachine<EncoderState, EncoderAction> {
         val openGLScene = OpenGLScene(
             encoder.encoderWidth,
             encoder.encoderHeight,
-            fullscreenTextureId = cameraTextureId,
-            smallTextureId = drawableTextureId
+            fullscreenTextureId = cameraTextureId
         )
 
         return state.encoderHolder.copy(
@@ -123,7 +120,6 @@ class EncoderMachine : StateMachine<EncoderState, EncoderAction> {
             eglSurface = eglSurface,
             openGLScene = openGLScene,
             encoder = encoder,
-            drawableTextureId = drawableTextureId,
             cameraTextureId = cameraTextureId
         )
     }
@@ -177,7 +173,6 @@ sealed class EncoderAction: Action {
     class Start(val surfaceProducer: SimpleProducer<EncoderSurfaceParams>): EncoderAction()
     class GLContextReady(
         val sharedEglContext: EGLContext,
-        val drawableTextureId: Int,
         val cameraTextureId: Int
     ): EncoderAction()
     object AddFrame: EncoderAction()
@@ -196,7 +191,6 @@ data class EncoderHolder(
     val openGLScene: OpenGLScene? = null,
     val encoder: EncoderHelper? = null,
     val eglSurface: EGLSurface? = null,
-    val drawableTextureId: Int = 0,
     val cameraTextureId: Int = 0
 )
 
@@ -204,4 +198,4 @@ typealias ToggleRecordCallback = (isActive: Boolean) -> Unit
 
 typealias EncoderDrawingCaller = () -> Unit
 
-typealias EncoderSurfaceParams = Triple<EGLContext, Int, Int>
+typealias EncoderSurfaceParams = Pair<EGLContext, Int>

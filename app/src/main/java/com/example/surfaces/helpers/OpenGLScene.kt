@@ -9,8 +9,7 @@ import com.example.surfaces.utils.ShaderUtils
 class OpenGLScene(
     sceneWidth: Int,
     sceneHeight: Int,
-    fullscreenTextureId: Int? = null,
-    smallTextureId: Int? = null
+    fullscreenTextureId: Int? = null
 ) {
     private val programId: Int
     private val uMVPMatrixHandle: Int
@@ -58,20 +57,6 @@ class OpenGLScene(
         rotate = Surface.ROTATION_90
     )
 
-    val smallTexture = OpenGLExternalTexture(
-        textureWidth = (0.25f * sceneWidth).toInt(),
-        textureHeight = (0.25f * sceneHeight).toInt(),
-        verticesData = floatArrayOf(
-           // X,   Y,      Z,     U,  V
-             0.3f,   0.3f,  0.0f,  0f, 0f,
-             0.8f,   0.3f,  0.0f,  1f, 0f,
-             0.3f,   0.8f,  0.0f,  0f, 1f,
-             0.8f,   0.8f,  0.0f,  1f, 1f
-        ),
-        externalTextureId = smallTextureId,
-        rotate = Surface.ROTATION_0
-    )
-
     init {
         GLES20.glViewport(0, 0, sceneWidth, sceneHeight)
 
@@ -107,7 +92,6 @@ class OpenGLScene(
     }
 
     fun release() {
-        smallTexture.release()
         fullscreenTexture.release()
     }
 
@@ -125,12 +109,6 @@ class OpenGLScene(
             uMvpHandler = uMVPMatrixHandle
         )
 
-        smallTexture.updateFrame(
-            aPositionHandle = aPositionHandle,
-            aTextureCoordHandler = aTextureCoordHandler,
-            uTexHandler = uTexMatrixHandle,
-            uMvpHandler = uMVPMatrixHandle
-        )
     }
 
     companion object {
